@@ -6,21 +6,14 @@
   <style>
     body {
       font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
-      background: #0e0e14;
-      color: #e8e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
+      background: #0e0e14; color: #e8e8f0;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; margin: 0;
     }
     .card {
-      text-align: center;
-      padding: 40px 48px;
-      background: #16161f;
-      border: 1px solid #2a2a3a;
-      border-radius: 16px;
-      max-width: 400px;
+      text-align: center; padding: 40px 48px;
+      background: #16161f; border: 1px solid #2a2a3a;
+      border-radius: 16px; max-width: 400px;
     }
     .logo { font-size: 48px; margin-bottom: 16px; }
     h2 { font-size: 20px; font-weight: 600; margin: 0 0 8px; }
@@ -33,62 +26,26 @@
 <div class="card">
   <div class="logo">🛡️</div>
   <h2 id="title">Connecting to Google Drive…</h2>
-  <p  id="msg">Please wait.</p>
+  <p id="msg">Please wait, do not close this tab.</p>
 </div>
-
 <script>
-(function () {
-  // Google returns the token in the URL hash (implicit flow)
-  // OR as query params with code (authorization code flow)
-
-  const hash   = new URLSearchParams(window.location.hash.slice(1));
-  const query  = new URLSearchParams(window.location.search);
-
-  const token     = hash.get('access_token') || query.get('access_token');
-  const code      = query.get('code');   // authorization code flow
-  const expiresIn = hash.get('expires_in') || query.get('expires_in') || '3600';
-  const error     = hash.get('error')   || query.get('error');
-
-  const titleEl = document.getElementById('title');
-  const msgEl   = document.getElementById('msg');
+  const params = new URLSearchParams(window.location.search);
+  const code   = params.get('code');
+  const error  = params.get('error');
 
   if (error) {
-    titleEl.textContent = 'Connection failed';
-    titleEl.className   = 'fail';
-    msgEl.textContent   = 'Error: ' + error + '. Please close this tab and try again.';
-    return;
-  }
-
-  if (!token && !code) {
-    titleEl.textContent = 'No token received';
-    titleEl.className   = 'fail';
-    msgEl.textContent   = 'Something went wrong. Please close this tab and try again.';
-    return;
-  }
-
-  // Send token back to the extension via postMessage
-  // The extension background listens for this message
-  if (window.opener) {
-    window.opener.postMessage(
-      {
-        type:      'SPOILED_OAUTH_CALLBACK',
-        token,
-        code,
-        expiresIn: parseInt(expiresIn, 10)
-      },
-      '*'
-    );
-    titleEl.textContent = 'Connected!';
-    titleEl.className   = 'ok';
-    msgEl.textContent   = 'Google Drive connected successfully. You can close this tab.';
-    setTimeout(() => window.close(), 2000);
+    document.getElementById('title').textContent = 'Connection failed';
+    document.getElementById('title').className   = 'fail';
+    document.getElementById('msg').textContent   = 'Error: ' + error + '. Please close this tab and try again.';
+  } else if (code) {
+    document.getElementById('title').textContent = 'Connected!';
+    document.getElementById('title').className   = 'ok';
+    document.getElementById('msg').textContent   = 'Google Drive connected. This tab will close automatically.';
   } else {
-    // Fallback: write token to URL so extension can read it
-    titleEl.textContent = 'Connected!';
-    titleEl.className   = 'ok';
-    msgEl.textContent   = 'Google Drive connected. You can close this tab.';
+    document.getElementById('title').textContent = 'Something went wrong';
+    document.getElementById('title').className   = 'fail';
+    document.getElementById('msg').textContent   = 'No authorization code received. Please try again.';
   }
-})();
 </script>
 </body>
 </html>
