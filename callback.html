@@ -2,10 +2,10 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Spoiled – Connecting…</title>
+  <title>Spoiled</title>
   <style>
     body {
-      font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, 'Segoe UI', sans-serif;
       background: #0e0e14; color: #e8e8f0;
       display: flex; align-items: center; justify-content: center;
       min-height: 100vh; margin: 0;
@@ -13,65 +13,17 @@
     .card {
       text-align: center; padding: 40px 48px;
       background: #16161f; border: 1px solid #2a2a3a;
-      border-radius: 16px; max-width: 420px; width: 90%;
+      border-radius: 16px; max-width: 380px;
     }
-    .logo { font-size: 48px; margin-bottom: 16px; }
-    h2 { font-size: 20px; font-weight: 600; margin: 0 0 8px; }
-    p  { font-size: 14px; color: #666; margin: 0; line-height: 1.6; }
-    .ok   { color: #22c55e; }
-    .fail { color: #ef4444; }
-    code  { background: #1d1d29; padding: 2px 6px; border-radius: 4px; font-size: 12px; word-break: break-all; }
+    h2 { font-size: 20px; font-weight: 600; margin: 0 0 8px; color: #22c55e; }
+    p  { font-size: 14px; color: #666; margin: 0; }
   </style>
 </head>
 <body>
 <div class="card">
-  <div class="logo">🛡️</div>
-  <h2 id="title">Connecting…</h2>
-  <p id="msg">Please wait.</p>
+  <div style="font-size:48px;margin-bottom:16px">🛡️</div>
+  <h2>Connected!</h2>
+  <p>You can close this tab. Syncing your blocklist now.</p>
 </div>
-<script>
-(function () {
-  const params = new URLSearchParams(window.location.search);
-  const code   = params.get('code');
-  const error  = params.get('error');
-  const title  = document.getElementById('title');
-  const msg    = document.getElementById('msg');
-
-  if (error) {
-    title.textContent = 'Connection failed';
-    title.className   = 'fail';
-    msg.textContent   = 'Error: ' + error;
-    return;
-  }
-
-  if (!code) {
-    title.textContent = 'No code received';
-    title.className   = 'fail';
-    msg.innerHTML     = 'URL: <code>' + window.location.href + '</code>';
-    return;
-  }
-
-  title.textContent = 'Connected!';
-  title.className   = 'ok';
-  msg.textContent   = 'Sending to extension… this tab will close.';
-
-  // Send code to extension via chrome.runtime.sendMessage
-  // Extension ID must match exactly
-  const EXT_ID = 'geknmcgfhnhpmibiafhnklblgbfcajnf';
-
-  if (typeof chrome !== 'undefined' && chrome.runtime) {
-    chrome.runtime.sendMessage(EXT_ID, { type: 'OAUTH_CODE', code }, res => {
-      if (chrome.runtime.lastError) {
-        msg.textContent = 'Error sending to extension: ' + chrome.runtime.lastError.message;
-        return;
-      }
-      msg.textContent = 'Done! This tab will close.';
-      setTimeout(() => window.close(), 1000);
-    });
-  } else {
-    msg.innerHTML = 'Extension not found. Code: <code>' + code + '</code>';
-  }
-})();
-</script>
 </body>
 </html>
