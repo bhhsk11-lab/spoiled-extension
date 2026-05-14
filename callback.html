@@ -1,29 +1,12 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Spoiled</title>
-  <style>
-    body {
-      font-family: -apple-system, 'Segoe UI', sans-serif;
-      background: #0e0e14; color: #e8e8f0;
-      display: flex; align-items: center; justify-content: center;
-      min-height: 100vh; margin: 0;
-    }
-    .card {
-      text-align: center; padding: 40px 48px;
-      background: #16161f; border: 1px solid #2a2a3a;
-      border-radius: 16px; max-width: 380px;
-    }
-    h2 { font-size: 20px; font-weight: 600; margin: 0 0 8px; color: #22c55e; }
-    p  { font-size: 14px; color: #666; margin: 0; }
-  </style>
-</head>
+<head><meta charset="utf-8"><title>Spoiled – Connected</title></head>
 <body>
-<div class="card">
-  <div style="font-size:48px;margin-bottom:16px">🛡️</div>
-  <h2>Connected!</h2>
-  <p>You can close this tab. Syncing your blocklist now.</p>
-</div>
+<script>
+  // launchWebAuthFlow opens this page inside a hidden browser.
+  // We just need to land here — Chrome intercepts the redirect automatically.
+  // Nothing else needed. The page can be blank.
+  window.close();
+</script>
 </body>
 </html>
