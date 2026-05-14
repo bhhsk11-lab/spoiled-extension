@@ -1,12 +1,115 @@
 <!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><title>Spoiled – Connected</title></head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spoiled – Authentication</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0e0e14;
+      color: #e8e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: #16161f;
+      border: 1px solid #2a2a3a;
+      border-radius: 14px;
+      padding: 40px 48px;
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+    }
+
+    .icon {
+      font-size: 48px;
+      line-height: 1;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #e8e8f0;
+      margin-bottom: 10px;
+      letter-spacing: -0.3px;
+    }
+
+    p {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    /* Success state (default) */
+    .state-success .icon::before { content: '✅'; }
+    .state-success h1 { color: #22c55e; }
+
+    /* Error state */
+    .state-error .icon::before { content: '❌'; }
+    .state-error h1 { color: #ef4444; }
+
+    /* Waiting state */
+    .state-waiting .icon::before { content: '🛡️'; }
+
+    .error-detail {
+      margin-top: 12px;
+      font-family: monospace;
+      font-size: 11px;
+      color: #ef4444;
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 6px;
+      padding: 8px 12px;
+      word-break: break-all;
+    }
+  </style>
+</head>
 <body>
-<script>
-  // launchWebAuthFlow opens this page inside a hidden browser.
-  // We just need to land here — Chrome intercepts the redirect automatically.
-  // Nothing else needed. The page can be blank.
-  window.close();
-</script>
+  <div class="card state-waiting" id="card">
+    <span class="icon" id="icon"></span>
+    <h1 id="title">Completing sign-in…</h1>
+    <p id="msg">Please wait while the Spoiled extension finishes connecting to Google Drive.</p>
+    <div class="error-detail" id="errorDetail" style="display:none"></div>
+  </div>
+
+  <script>
+    // This page is the OAuth redirect target.
+    // The Spoiled extension's tabs.onUpdated listener detects this URL,
+    // extracts the auth code from the query string, closes this tab,
+    // and refocuses the options page — all automatically.
+    //
+    // This page just shows a friendly status message for the brief
+    // moment before the tab is closed.
+
+    const params = new URLSearchParams(window.location.search);
+    const code   = params.get('code');
+    const error  = params.get('error');
+    const card   = document.getElementById('card');
+    const title  = document.getElementById('title');
+    const msg    = document.getElementById('msg');
+    const detail = document.getElementById('errorDetail');
+
+    if (code) {
+      // Auth code present — extension will pick this up via tabs.onUpdated
+      card.className = 'card state-success';
+      title.textContent = 'Authentication complete';
+      msg.textContent   = 'You can close this tab. The Spoiled extension is now connecting to Google Drive.';
+    } else if (error) {
+      card.className = 'card state-error';
+      title.textContent = 'Authentication failed';
+      msg.textContent   = 'Google returned an error. Please close this tab and try again.';
+      detail.textContent = error;
+      detail.style.display = 'block';
+    }
+    // else: waiting state — tab hasn't received the redirect yet (shouldn't happen)
+  </script>
 </body>
 </html>
